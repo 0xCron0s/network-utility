@@ -5,25 +5,41 @@ import subprocess
 
 def list_network_info():
     """Displays network interface information."""
-    command = 'ip addr show'
-    subprocess.run(command, shell=True)
+    command = ['ip', 'addr', 'show']
+    try:
+        subprocess.run(command, check=True)
+    except subprocess.CalledProcessError as e:
+        print(f'Error executing command: {e}')
 
 def verify_connectivity(host):
     """Checks network connectivity by pinging the specified host."""
-    command = f'ping -c 4 {host}'
-    subprocess.run(command, shell=True)
+    command = ['ping', '-c', '4', host]
+    try:
+        subprocess.run(command, check=True)
+    except subprocess.CalledProcessError as e:
+        print(f'Error executing command: {e}')
 
 def restart_networking():
     """Restarts the networking service and displays its status."""
-    command = 'sudo systemctl restart networking && systemctl status networking'
-    subprocess.run(command, shell=True)
+    restart_command = ['sudo', 'systemctl', 'restart', 'networking']
+    status_command = ['systemctl', 'status', 'networking']
+    try:
+        subprocess.run(restart_command, check=True)
+        subprocess.run(status_command, check=True)
+    except subprocess.CalledProcessError as e:
+        print(f'Error executing command: {e}')
 
 def configure_interface(address, netmask, interface):
     """Configures the network interface with the provided IP address, netmask, and interface name."""
-    command = f'sudo ip addr add {address}/{netmask} dev {interface} && '
-    command += f'sudo ip link set {interface} up && '
-    command += f'ip addr show {interface}'
-    subprocess.run(command, shell=True)
+    configure_command = ['sudo', 'ip', 'addr', 'add', f'{address}/{netmask}', 'dev', interface]
+    up_command = ['sudo', 'ip', 'link', 'set', interface, 'up']
+    show_command = ['ip', 'addr', 'show', interface]
+    try:
+        subprocess.run(configure_command, check=True)
+        subprocess.run(up_command, check=True)
+        subprocess.run(show_command, check=True)
+    except subprocess.CalledProcessError as e:
+        print(f'Error executing command: {e}')
 
 def main():
     # Create an ArgumentParser object
@@ -47,15 +63,20 @@ def main():
     interface = args.interface
 
     # Perform the appropriate action based on user input
-    match action:
-        case 'list':
-            list_network_info()
-        case 'verify':
+    if action == 'list':
+        list_network_info()
+    elif action == 'verify':
+        if host:
             verify_connectivity(host)
-        case 'restart':
-            restart_networking()
-        case 'configure':
+        else:
+            print('Host is required for verify action.')
+    elif action == 'restart':
+        restart_networking()
+    elif action == 'configure':
+        if address and netmask and interface:
             configure_interface(address, netmask, interface)
+        else:
+            print('Address, netmask, and interface are required for configure action.')
 
 if __name__ == "__main__":
     main()
