@@ -63,20 +63,21 @@ def main():
     interface = args.interface
 
     # Perform the appropriate action based on user input
-    if action == 'list':
-        list_network_info()
-    elif action == 'verify':
-        if host:
-            verify_connectivity(host)
-        else:
-            print('Host is required for verify action.')
-    elif action == 'restart':
-        restart_networking()
-    elif action == 'configure':
-        if address and netmask and interface:
-            configure_interface(address, netmask, interface)
-        else:
-            print('Address, netmask, and interface are required for configure action.')
+    match action:
+        case 'list':
+            list_network_info()
+        case 'verify':
+            if host:
+                verify_connectivity(host)
+            else:
+                print('Host is required for verify action.')
+        case 'restart':
+            restart_networking()
+        case 'configure':
+            if address and netmask and interface:
+                configure_interface(address, netmask, interface)
+            else:
+                print('Address, netmask, and interface are required for configure action.')
 
 if __name__ == "__main__":
     main()
