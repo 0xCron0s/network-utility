@@ -19,4 +19,3 @@ I wrote this code as part of a practical activity during my studies at universit
 
 ```bash
 python3 network_utility.py <action> [--host HOST] [--address ADDRESS] [--netmask NETMASK] [--interface INTERFACE]
-
